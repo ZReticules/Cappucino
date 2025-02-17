@@ -5,21 +5,25 @@ from PyQt6 import uic
 from PyQt6.QtWidgets import QApplication, QDialog, QTableWidget, QTableWidgetItem, QPushButton, QMainWindow, \
     QRadioButton, QComboBox, QSpinBox, QMessageBox
 
+from addEditCoffee import Ui_Dialog
+from main_ui import Ui_MainWindow
 
-class AddUpdateForm(QDialog):
+
+class AddUpdateForm(QDialog, Ui_Dialog):
     def __init__(self, parent):
         super().__init__(parent)
+        self.setupUi(self)
         self.lastId = 0
         self.con = None
         self.cur = None
-        uic.loadUi('addEditCoffeeForm.ui', self)
+        # uic.loadUi('UI/addEditCoffeeForm.ui', self)
         self.addButton.clicked.connect(self.addClicked)
         self.delButton.clicked.connect(self.delClicked)
         self.idUpdCombo.currentIndexChanged.connect(self.loadForUpdate)
         self.updButton.clicked.connect(self.updClicked)
 
     def showEvent(self, a0):
-        self.con = sqlite3.connect("coffee.sqlite")
+        self.con = sqlite3.connect("data/coffee.sqlite")
         self.cur = self.con.cursor()
         self.updIdCombo()
         # self.cmb = QComboBox(self)
@@ -45,7 +49,7 @@ class AddUpdateForm(QDialog):
         result = self.cur.execute(f"""
             SELECT name, degree, type, taste, cost, volume 
             FROM Coffee WHERE ID = {self.idUpdCombo.currentText() or "NULL"}"""
-        ).fetchall()[0]
+                                  ).fetchall()[0]
         self.nameUpdEdit.setText(result[0])
         self.degreeUpdSpinBox.setValue(result[1])
         self.typeUpdRadio.setChecked(result[2])
@@ -68,8 +72,8 @@ class AddUpdateForm(QDialog):
 
     def delClicked(self):
         if QMessageBox.question(
-            self, '', f"Действительно удалить элемент с id {self.idUpdCombo.currentText()}",
-            buttons=QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                self, '', f"Действительно удалить элемент с id {self.idUpdCombo.currentText()}",
+                buttons=QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         ) == QMessageBox.StandardButton.Yes:
             self.cur.execute(f"""DELETE FROM Coffee WHERE ID = {self.idUpdCombo.currentText() or "NULL"}""")
             self.con.commit()
@@ -95,10 +99,11 @@ class AddUpdateForm(QDialog):
         self.con.close()
 
 
-class ViewForm(QMainWindow):
+class ViewForm(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('main.ui', self)
+        self.setupUi(self)
+        # uic.loadUi('UI/main.ui', self)
         self.initUI()
 
     def initUI(self):
@@ -117,7 +122,7 @@ class ViewForm(QMainWindow):
         self.showCoffee()
 
     def showCoffee(self):
-        con = sqlite3.connect("coffee.sqlite")
+        con = sqlite3.connect("data/coffee.sqlite")
         cur = con.cursor()
         result = cur.execute(f"""SELECT ID, name, degree, type, taste, cost, volume FROM Coffee""").fetchall()
         con.close()
