@@ -15,8 +15,8 @@ class AddUpdateForm(QDialog, Ui_Dialog):
         self.lastId = 0
         self.con = None
         self.cur = None
-        uic.loadUi('UI/addEditCoffeeForm.ui', self)
-        # self.setupUi(self)
+        # uic.loadUi('UI/addEditCoffeeForm.ui', self)
+        self.setupUi(self)
         self.addButton.clicked.connect(self.addClicked)
         self.delButton.clicked.connect(self.delClicked)
         self.idUpdCombo.currentIndexChanged.connect(self.loadForUpdate)
@@ -102,8 +102,8 @@ class AddUpdateForm(QDialog, Ui_Dialog):
 class ViewForm(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        # self.setupUi(self)
-        uic.loadUi('UI/main.ui', self)
+        self.setupUi(self)
+        # uic.loadUi('UI/main.ui', self)
         self.initUI()
 
     def initUI(self):
