@@ -16,6 +16,7 @@ class AddUpdateForm(QDialog):
         self.addButton.clicked.connect(self.addClicked)
         self.delButton.clicked.connect(self.delClicked)
         self.idUpdCombo.currentIndexChanged.connect(self.loadForUpdate)
+        self.updButton.clicked.connect(self.updClicked)
 
     def showEvent(self, a0):
         self.con = sqlite3.connect("coffee.sqlite")
@@ -74,6 +75,21 @@ class AddUpdateForm(QDialog):
             self.con.commit()
             self.updIdCombo()
             self.loadForUpdate()
+
+    def updClicked(self):
+        self.cur.execute(f"""
+        UPDATE COFFEE SET
+            name = "{self.nameUpdEdit.text()}",
+            degree = {self.degreeUpdSpinBox.text()},
+            type = {str(self.typeUpdRadio.isChecked()).upper()},
+            taste = "{self.tasteUpdEdit.toPlainText()}",
+            cost = {self.costUpdSpinBox.text() or "0"},
+            volume = {self.volumeUpdSpinBox.text() or "0"}
+        WHERE ID = {self.idUpdCombo.currentText() or "NULL"}
+        """)
+        self.con.commit()
+        self.updIdCombo()
+        self.loadForUpdate()
 
     def closeEvent(self, a0):
         self.con.close()
